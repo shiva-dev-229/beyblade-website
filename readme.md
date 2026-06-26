@@ -1,73 +1,133 @@
-# Bug Bistro — A Fictional Edible-Insect Restaurant
+# Beyblade Platform — Full-Stack Web App
 
-> A playful React web app for an imaginary restaurant that serves **edible insects**. Browse a full bug-based menu by course, build your own three-course order, and watch the total update — a creative front-end project with a real-world hook: insects are one of the most sustainable protein sources on the planet.
+> A full-stack Beyblade encyclopedia and **battle simulator**. Browse a database of Beyblades and their stats, pit any two against each other and have the outcome simulated from their attributes, convert names between the Hasbro and Takara Tomy naming systems, and more — served by a custom REST API over a MongoDB database, with a responsive React front end.
 
 ---
 
-## About
+## Overview
 
-**Bug Bistro** is a concept restaurant site built as a React app. It takes the familiar restaurant-menu format and applies it to entomophagy — eating insects — presenting bug-based dishes the same way any restaurant would present its menu, complete with nutrition info, prices, and descriptions.
+This project is a complete three-tier application built around competitive Beyblade Burst:
 
-The project is half creative concept, half front-end exercise: behind the fun premise, it's a data-driven app that demonstrates React state management, lifting state across components, and computed values.
+```
+beyblade-website/                  ← repo root (monorepo)
+├── beyblade-api/                  ← Express + MongoDB REST API (the backend)
+├── beyblade-database/             ← CSV datasets + a Python ETL script
+└── beyblade-website/              ← React single-page app (the frontend)
+```
+
+The frontend talks to the API over HTTP (via axios); the API reads and writes a MongoDB database; the database is seeded from CSV data through a small Python conversion script.
 
 ---
 
 ## Features
 
-- **Full themed menu** — ten dishes across three courses (Appetizers, Main Dishes, Desserts), each listing its calories, protein, price, the insects it features, and recommended sides. (Where else can you order Tomato Soup with crickets, a Lemon-Ant Stir Fry, or a Tarantula dessert?)
-- **Build-your-order interface** — pick one dish per course; selections are tracked in React state.
-- **Live price total** — a "Buy" button tallies the chosen dishes through a `calcPrice` helper and displays the order total.
-- **Q&A section** — a data-driven list of questions and answers about the concept, rendered by mapping over a questions dataset.
+- **Beyblade database** — every Beyblade stored with its series and six battle stats: attack, burst, defense, weight, agility, and stamina.
+- **Battle simulator** — submit two Beyblades and the API returns a predicted winner, computed from their stats (see [How the battle engine works](#how-the-battle-engine-works)).
+- **Name converter** — translate Beyblade names between the **Hasbro** and **Takara Tomy** naming systems, which differ between regions.
+- **Search** — look up Beyblades in the database.
+- **Music** — a collection of Beyblade-related songs.
+- **Users** — user account support.
+- **Responsive front end** — the React app renders distinct desktop and mobile layouts, with sections covering how to use the site, curated shopping links (Hasbro, Amazon, eBay, Walmart, Target), recommended YouTube creators, and an "About the Maker" page.
 
 ---
 
-## How it's built
+## How the battle engine works
 
-The app keeps its content separate from its presentation, which makes the menu easy to extend:
+The battle logic (`beyblade-api/routes/Battle/Check.js`) decides a winner in two stages:
 
-- **`src/Public/Data.js`** — the menu itself (dishes grouped into `appetizer`, `main_dish`, and `dessert`) plus the `calcPrice` helper. Adding a dish is just adding an object here.
-- **`src/Components/Menu.js`** — holds the order state (one selection per course) and renders each course via the reusable `Food` component; the "Buy" button computes the total.
-- **`src/Components/Food.js`** — renders a course's dishes as selectable cards.
-- **`src/Components/QA.js`** — renders the Q&A by mapping over the questions data.
-- **`src/Components/Title.js` / `Minibar.js`** — page chrome.
+1. **Decisive matchup.** It first compares each Beyblade's combined `attack + weight + agility`. If one is clearly higher, that Beyblade wins outright.
+2. **Drawn-out battle.** If the two are evenly matched, the engine simulates the fight turn by turn. Each turn is chosen at random; the attacker deals damage equal to the difference in `defense + stamina + agility` between the two blades, subtracted from the defender's `burst` value. The first Beyblade whose burst drops below zero loses. Identical Beyblades return a tie ("the match will depend on the player").
 
-```
-src/
-├── App.js                  # Title + Menu + Q&A + Minibar
-├── Components/
-│   ├── Menu.js             # Order state + live total
-│   ├── Food.js             # Selectable dish cards
-│   ├── QA.js / Question(s) # Q&A section
-│   ├── Title.js
-│   └── Minibar.js
-├── Public/
-│   └── Data.js             # Menu data + price logic
-└── Index.scss              # SCSS styling
-```
-
----
-
-## Getting started
-
-This is a [Create React App](https://create-react-app.dev/) project.
-
-```bash
-npm install      # install dependencies
-npm start        # run locally at http://localhost:3000
-npm run build    # production build
-```
+It's a compact, stat-driven model that turns six numbers into a plausible match outcome.
 
 ---
 
 ## Tech stack
 
-- **React 18** — components, `useState`, lifted state, computed totals
-- **SCSS** — styling
-- **react-icons** — iconography
-- **Create React App** — tooling
+**Backend (`beyblade-api/`)**
+- Node.js + **Express** — REST API and routing
+- **MongoDB** + **Mongoose** — database and schema modeling
+- **morgan** — HTTP request logging
+- **dotenv** — environment configuration
+
+**Frontend (`beyblade-website/`)**
+- **React** + **react-router-dom** — SPA with client-side routing
+- **axios** — API requests
+- **Firebase** — app services
+- **SCSS** (Sass) and **react-icons** — styling and icons
+
+**Data (`beyblade-database/`)**
+- CSV datasets + a **Python** script for converting them into database seed statements
 
 ---
 
-## The real point
+## Getting started
 
-Behind the novelty, edible insects are a genuinely serious idea: they require a fraction of the land, water, and feed of conventional livestock per gram of protein, and are a staple food for billions of people worldwide. Bug Bistro dresses that idea up as a restaurant you'd actually want to order from.
+### Prerequisites
+- [Node.js](https://nodejs.org/)
+- A running [MongoDB](https://www.mongodb.com/) instance (local or hosted, e.g. Atlas)
+- Python 3 (only needed to regenerate database seed data)
+
+### 1. Start the API
+
+```bash
+cd beyblade-api
+npm install
+```
+
+Create a `.env` file in `beyblade-api/` with:
+
+```
+DATABASE_URL=mongodb://localhost:27017/beyblade   # your MongoDB connection string
+HOST=localhost
+PORT=5000
+```
+
+Then run:
+
+```bash
+npm start          # production
+npm run dev-start  # development, with nodemon auto-reload
+```
+
+The API will connect to MongoDB and listen on the host/port you set.
+
+### 2. Seed the database
+
+The Beyblade data lives in `beyblade-database/`. The included Python script reads `BEYBLADE.csv` and prints MongoDB insert statements:
+
+```bash
+cd beyblade-database
+python3 convert.py
+```
+
+Run the generated `db.beyblades.insert({...})` statements against your MongoDB database to populate it.
+
+### 3. Start the front end
+
+```bash
+cd beyblade-website          # the inner frontend folder
+npm install
+npm start                    # runs at http://localhost:3000
+```
+
+The front end expects the API to be reachable at the host/port configured above (CORS on the API is set to allow the front end's origin on port 3000).
+
+---
+
+## API routes
+
+| Route | Purpose |
+| --- | --- |
+| `GET /beyblades` | List / retrieve Beyblades |
+| `GET /battle?bey1=<id>&bey2=<id>` | Simulate a battle between two Beyblades |
+| `GET /search` | Search the Beyblade database |
+| `/names` | Convert names between Hasbro and Takara Tomy |
+| `/music` | Beyblade songs |
+| `/users` | User accounts |
+
+---
+
+## Notes
+
+This is a personal project built out of an interest in competitive Beyblade Burst. It brings together a REST API, a database with a real data pipeline, a battle-simulation algorithm, and a responsive React client — the data and stats are drawn from the Beyblade community and official sources, used here for a fan project.
