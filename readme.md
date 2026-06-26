@@ -1,201 +1,73 @@
-# Api
+# Bug Bistro — A Fictional Edible-Insect Restaurant
 
-This is an api made in express using mongodb and mongoose.
+> A playful React web app for an imaginary restaurant that serves **edible insects**. Browse a full bug-based menu by course, build your own three-course order, and watch the total update — a creative front-end project with a real-world hook: insects are one of the most sustainable protein sources on the planet.
 
-This api is a part of a beyblade app that I am building.
+---
 
-The app's files are in the project structr (one level up).
+## About
 
-The api excepts json as an input for the body.
+**Bug Bistro** is a concept restaurant site built as a React app. It takes the familiar restaurant-menu format and applies it to entomophagy — eating insects — presenting bug-based dishes the same way any restaurant would present its menu, complete with nutrition info, prices, and descriptions.
 
-Enjoy the api each endpoint is listed below along with what you need to pass it as data !!!
+The project is half creative concept, half front-end exercise: behind the fun premise, it's a data-driven app that demonstrates React state management, lifting state across components, and computed values.
 
-## Install
+---
 
-    npm install;
+## Features
 
-    Creat a env with these props : 
-    DATABASE_URL, PORT, HOST, API_URL - (http://HOST:PORT/)
+- **Full themed menu** — ten dishes across three courses (Appetizers, Main Dishes, Desserts), each listing its calories, protein, price, the insects it features, and recommended sides. (Where else can you order Tomato Soup with crickets, a Lemon-Ant Stir Fry, or a Tarantula dessert?)
+- **Build-your-order interface** — pick one dish per course; selections are tracked in React state.
+- **Live price total** — a "Buy" button tallies the chosen dishes through a `calcPrice` helper and displays the order total.
+- **Q&A section** — a data-driven list of questions and answers about the concept, rendered by mapping over a questions dataset.
 
-## Running and Testing and development env
+---
 
-    run ~ npm start
-    development ~ npm dev-start
-    test ~ npm test
+## How it's built
 
-## REST API
+The app keeps its content separate from its presentation, which makes the menu easy to extend:
 
-### Adding an endpoint
+- **`src/Public/Data.js`** — the menu itself (dishes grouped into `appetizer`, `main_dish`, and `dessert`) plus the `calcPrice` helper. Adding a dish is just adding an object here.
+- **`src/Components/Menu.js`** — holds the order state (one selection per course) and renders each course via the reusable `Food` component; the "Buy" button computes the total.
+- **`src/Components/Food.js`** — renders a course's dishes as selectable cards.
+- **`src/Components/QA.js`** — renders the Q&A by mapping over the questions data.
+- **`src/Components/Title.js` / `Minibar.js`** — page chrome.
 
-#### Create a new js file and start with this stater code :
-
-```javascript
-const express = require('express');
-
-const router = express.Router()
-
-module.exports = router
-
-// Where get is you can add the name of your http function
-router.get('/url', (req, res) => {
-	// Complecated operation
-	
-	// Getting body elements
-	const name = req.body.name;
-	
-	// Getting query elements
-	const last_name = req.query.last_name;
-	
-	// return status - statuscode json-response
-	return res.status(200).json({})
-})
+```
+src/
+├── App.js                  # Title + Menu + Q&A + Minibar
+├── Components/
+│   ├── Menu.js             # Order state + live total
+│   ├── Food.js             # Selectable dish cards
+│   ├── QA.js / Question(s) # Q&A section
+│   ├── Title.js
+│   └── Minibar.js
+├── Public/
+│   └── Data.js             # Menu data + price logic
+└── Index.scss              # SCSS styling
 ```
 
-### Make sure to add in server.js by :
+---
 
-```javascript
-const myrouter = require('path to your router')
-app.use('/your url', myrouter)
+## Getting started
+
+This is a [Create React App](https://create-react-app.dev/) project.
+
+```bash
+npm install      # install dependencies
+npm start        # run locally at http://localhost:3000
+npm run build    # production build
 ```
 
-### My Endpoints
+---
 
-#### BEYBLADES
+## Tech stack
 
-    Beyblades
-    TYPE: GET
-    ROUTE: /beyblades/
+- **React 18** — components, `useState`, lifted state, computed totals
+- **SCSS** — styling
+- **react-icons** — iconography
+- **Create React App** — tooling
 
-#### BATTLE
+---
 
-    Lab
-    TYPE: get
-    QUERY PARAMS: [bey_1_id, bey_2_id]
-    ROUTE: /battle/
+## The real point
 
-### SEARCH
-
-    SEARCH
-    TYPE: GET
-    QUERY PARAMS: [search (what to serch)]
-    ROUTE: /search/
-
-### NAMES
-
-####GET
-    Names
-    TYPE: GET
-    ROUTE: /names/
-
-#### SEARCH BOTH
-    SEARCH
-    TYPE: GET
-    QUERY PARAMS: [search (what to serch)]
-    ROUTE: /both/
-
-#### SEARCH Hasbro
-    SEARCH
-    TYPE: GET
-    QUERY PARAMS: [search (what to serch)]
-    ROUTE: /hasbro/
-
-#### SEARCH tt
-    SEARCH
-    TYPE: GET
-    QUERY PARAMS: [search (what to serch)]
-    ROUTE: /tt/
-
-### USERS
-
-#### ADD
-    Add User    
-    TYPE: POST
-    ROUTE: /users/
-    BODY: 
-
-```json5
-{
-	"nickname": "nickname",
-	"password": "password",
-	"gender": "male or female",
-	"color": "color",
-	"mail": "mail",
-	"phone": 0000000000,
-	"contacts": [],
-}
-```
-
-#### AUTH
-    Authentication
-    TYPE: POST
-    ROUTE: /users/auth/
-    BODY
-
-```json5
-{
-      "user": "name_entered_when_logging_in",
-      "password": "password_entered_when_logging_in"
-}
-```
-
-#### CONTACTS
-    Contacts of user
-    TYPE: GET
-    QUERY PARAMS: [id]
-    ROUTE: /users/contacts/
-
-#### ADD
-    Add A Contact
-    TYPE: GET
-    QUERY PARAMS: [new_contact_id, user_id]
-    ROUTE: /users/contacts/add/
-
-#### CONVERSATIONS
-    Get All Conversations Of A User
-    TYPE: GET
-    QUERY PARAMS: [id]
-    ROUTE: /users/conversations/
-
-#### NEW
-    Making A New Conversation
-    TYPE: POST
-    ROUTE: /conversation/new/
-    BODY: 
-```json5
-{
-      "users": []
-}
-```
-
-#### ADD
-    Adding A Conversation
-    TYPE: POST
-    ROUTE: /conversation/add
-    QUERY PARAMS: [id]
-    BODY: 
-```json5
-{
-      "from": "",
-      "value": ""
-}
-```
-
-### Music
-#### Get
-    Getting the songs
-    TYPE: GET
-    ROUTE: /music/
-    
-#### Add
-    Adding a song
-    TYPE: Post
-    ROUTE: /music/
-    BODY: 
-```json5
-{
-  _id: "",
-  name: ""
-}
-```
-
-![](./beyblade-website/src/Assets/Logo.png?raw=true)"# Beyblade" 
+Behind the novelty, edible insects are a genuinely serious idea: they require a fraction of the land, water, and feed of conventional livestock per gram of protein, and are a staple food for billions of people worldwide. Bug Bistro dresses that idea up as a restaurant you'd actually want to order from.
